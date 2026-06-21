@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Warehouse Picker</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header>
+        <h1>Warehouse Smart-Picking Navigator</h1>
+        <p>Optimized Inventory-to-Shelf Pathing Engine</p>
+    </header>
+
+    <main class="container">
+        <section class="controls">
+            <h3>Select Active Picking List</h3>
+            <select id="picklist-selector">
+                <option value="">-- Choose an Order --</option>
+            </select>
+            <button id="load-btn">Generate Optimized Path</button>
+        </section>
+
+        <div class="dashboard-grid">
+            <section class="table-section">
+                <h3>Optimized Picking Sequence</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Seq</th>
+                            <th>Item Name (SKU)</th>
+                            <th>Location (Bin)</th>
+                            <th>Qty</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="picking-items-body">
+                        <tr><td colspan="5" style="text-align:center;">Select an order above to map routes.</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="map-section">
+                <h3>Virtual Layout Map</h3>
+                <div class="canvas-container">
+                    <canvas id="warehouseMap" width="400" height="400"></canvas>
+                </div>
+                <p class="map-legend">🔴 Circles indicate sequential pick zones. Follow the path line.</p>
+            </section>
+        </div>
+    </main>
+    <script src="/app.js"></script>
+</body>
+</html>
