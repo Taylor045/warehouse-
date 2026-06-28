@@ -3,52 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Warehouse Picker</title>
+    <title>Warehouse Portal</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <header>
-        <h1>Warehouse Smart-Picking Navigator</h1>
-        <p>Optimized Inventory-to-Shelf Pathing Engine</p>
-    </header>
 
-    <main class="container">
-        <section class="controls">
-            <h3>Select Active Picking List</h3>
-            <select id="picklist-selector">
-                <option value="">-- Choose an Order --</option>
-            </select>
-            <button id="load-btn">Generate Optimized Path</button>
-        </section>
-
-        <div class="dashboard-grid">
-            <section class="table-section">
-                <h3>Optimized Picking Sequence</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Seq</th>
-                            <th>Item Name (SKU)</th>
-                            <th>Location (Bin)</th>
-                            <th>Qty</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="picking-items-body">
-                        <tr><td colspan="5" style="text-align:center;">Select an order above to map routes.</td></tr>
-                    </tbody>
-                </table>
-            </section>
-
-            <section class="map-section">
-                <h3>Virtual Layout Map</h3>
-                <div class="canvas-container">
-                    <canvas id="warehouseMap" width="400" height="400"></canvas>
-                </div>
-                <p class="map-legend">🔴 Circles indicate sequential pick zones. Follow the path line.</p>
-            </section>
+    <div id="auth-wrapper" class="auth-box">
+        <div id="login-card">
+            <h2>Warehouse Login</h2>
+            <p id="login-msg" class="error-msg"></p>
+            <form id="login-form">
+                <input type="text" id="login-user" placeholder="Enter Username / Email" required>
+                <input type="password" id="login-pass" placeholder="Enter Password" required>
+                <button type="submit">Sign In</button>
+            </form>
+            <p class="toggle-link">New user? <span onclick="toggleAuth(true)">Register here</span></p>
         </div>
-    </main>
+
+        <div id="signup-card" style="display: none;">
+            <h2>Create Account</h2>
+            <p id="signup-msg" class="error-msg"></p>
+            <form id="signup-form">
+                <input type="text" id="signup-user" placeholder="Create Username" required>
+                <input type="password" id="signup-pass" placeholder="Create Password" required>
+                <select id="signup-role">
+                    <option value="picker">Picker</option>
+                    <option value="manager">Manager</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <button type="submit">Register Account</button>
+            </form>
+            <p class="toggle-link">Back to <span onclick="toggleAuth(false)">Login</span></p>
+        </div>
+    </div>
+
+    <div id="main-dashboard" style="display: none;">
+        <header>
+            <div style="display:flex; justify-content: space-between; align-items:center; max-width: 1200px; margin: 0 auto;">
+                <h1>Warehouse Smart-Picking Navigator</h1>
+                <button id="logout-btn" style="background:#c0392b;">Logout</button>
+            </div>
+        </header>
+
+        <main class="container">
+            <section class="controls">
+                <h3>Select Active Picking List</h3>
+                <select id="picklist-selector">
+                    <option value="">-- Choose an Order --</option>
+                </select>
+                <button id="load-btn">Generate Optimized Path</button>
+            </section>
+
+            <div class="dashboard-grid">
+                <section class="table-section">
+                    <h3>Optimized Picking Sequence</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Seq</th>
+                                <th>Item Name (SKU)</th>
+                                <th>Location (Bin)</th>
+                                <th>Qty</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="picking-items-body"></tbody>
+                    </table>
+                </section>
+
+                <section class="map-section">
+                    <h3>Virtual Layout Map</h3>
+                    <canvas id="warehouseMap" width="400" height="400"></canvas>
+                </section>
+            </div>
+        </main>
+    </div>
+
     <script src="/app.js"></script>
 </body>
 </html>
