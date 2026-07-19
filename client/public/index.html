@@ -3,80 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warehouse Portal</title>
+    <title>Smart Warehouse Portal</title>
     <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="data:,">
 </head>
 <body>
 
     <div id="auth-wrapper" class="auth-box">
         <div id="login-card">
-            <h2>Warehouse Login</h2>
+            <h2>Hardware Warehouse Portal</h2>
             <p id="login-msg" class="error-msg"></p>
             <form id="login-form">
-                <input type="text" id="login-user" placeholder="Enter Username / Email" required>
-                <input type="password" id="login-pass" placeholder="Enter Password" required>
-                <button type="submit">Sign In</button>
+                <input type="text" id="login-user" placeholder="Username" required>
+                <input type="password" id="login-pass" placeholder="Password" required>
+                <button type="submit">Authenticate</button>
             </form>
-            <p class="toggle-link">New user? <span onclick="toggleAuth(true)">Register here</span></p>
+            <p class="toggle-link">System Admin? <span onclick="toggleAuth(true)">Register Worker</span></p>
         </div>
 
         <div id="signup-card" style="display: none;">
-            <h2>Create Account</h2>
+            <h2>Register New Warehouse Staff</h2>
             <p id="signup-msg" class="error-msg"></p>
             <form id="signup-form">
-                <input type="text" id="signup-user" placeholder="Create Username" required>
-                <input type="password" id="signup-pass" placeholder="Create Password" required>
+                <input type="text" id="signup-user" placeholder="Assign Username" required>
+                <input type="password" id="signup-pass" placeholder="Assign Password" required>
                 <select id="signup-role">
                     <option value="picker">Picker</option>
                     <option value="manager">Manager</option>
-                    <option value="admin">Admin</option>
                 </select>
-                <button type="submit">Register Account</button>
+                <button type="submit">Save User Profile</button>
             </form>
-            <p class="toggle-link">Back to <span onclick="toggleAuth(false)">Login</span></p>
+            <p class="toggle-link">Return to <span onclick="toggleAuth(false)">Login</span></p>
         </div>
     </div>
 
     <div id="main-dashboard" style="display: none;">
         <header>
-            <div style="display:flex; justify-content: space-between; align-items:center; max-width: 1200px; margin: 0 auto;">
-                <h1>Warehouse Smart-Picking Navigator</h1>
-                <button id="logout-btn" style="background:#c0392b;">Logout</button>
+            <div class="header-container">
+                <h1>Smart Warehouse Routing Panel</h1>
+                <div>
+                    <button onclick="switchTab('picker-tab')" style="background:#34495e; margin-right:10px;">Order Picking Engine</button>
+                    <button onclick="switchTab('inventory-tab')" style="background:#34495e; margin-right:10px;">Inventory Records</button>
+                    <button id="logout-btn" style="background:#c0392b;">Sign Out</button>
+                </div>
             </div>
         </header>
 
-        <main class="container">
-            <section class="controls">
-                <h3>Select Active Picking List</h3>
-                <select id="picklist-selector">
-                    <option value="">-- Choose an Order --</option>
-                </select>
-                <button id="load-btn">Generate Optimized Path</button>
-            </section>
-
-            <div class="dashboard-grid">
-                <section class="table-section">
-                    <h3>Optimized Picking Sequence</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Seq</th>
-                                <th>Item Name (SKU)</th>
-                                <th>Location (Bin)</th>
-                                <th>Qty</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="picking-items-body"></tbody>
-                    </table>
+        <div class="container">
+            
+            <div id="picker-tab" class="tab-content">
+                <section class="controls">
+                    <label><b>Active Picking Order:</b></label>
+                    <select id="picklist-selector"></select>
+                    <button id="load-btn">Generate Optimized Path Matrix</button>
                 </section>
 
-                <section class="map-section">
-                    <h3>Virtual Layout Map</h3>
-                    <canvas id="warehouseMap" width="400" height="400"></canvas>
-                </section>
+                <div class="dashboard-grid">
+                    <section class="table-section">
+                        <h3>Sequential Shelf Picking Instructions</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Sequence</th>
+                                    <th>SKU Profile</th>
+                                    <th>Item Details</th>
+                                    <th>Target Bin Location</th>
+                                    <th>Qty Pick</th>
+                                    <th>Status Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="picking-items-body"></tbody>
+                        </table>
+                    </section>
+
+                    <section class="map-section">
+                        <h3>Real-Time Spatial Path Map</h3>
+                        <div style="background:#fff; padding:10px; border-radius:5px; text-align:center;">
+                            <canvas id="warehouseMap" width="360" height="400"></canvas>
+                        </div>
+                        <p style="font-size:0.85rem; color:#666; margin-top:10px;">
+                            🟩 Start Node | 🔴 Picking Zone Targets | 🏁 Line displays optimized walking path minimizing picker exhaustion.
+                        </p>
+                    </section>
+                </div>
             </div>
-        </main>
+
+            <div id="inventory-tab" class="tab-content" style="display:none;">
+                <div class="dashboard-grid">
+                    <section class="table-section">
+                        <h3>Add New SKU Asset</h3>
+                        <form id="inventory-form" style="display:flex; flex-direction:column; gap:10px;">
+                            <input type="text" id="inv-name" placeholder="Item Name (e.g. 12mm Steel Bolts)" required>
+                            <input type="text" id="inv-sku" placeholder="SKU String (Unique Code)" required>
+                            <input type="number" id="inv-qty" placeholder="Opening Stock Quantity" required>
+                            <input type="number" id="inv-bin" placeholder="Assigned Bin Target ID (1-6)" required>
+                            <button type="submit" style="background:#27ae60;">Commit Stock Record</button>
+                        </form>
+                    </section>
+
+                    <section class="table-section">
+                        <h3>Current Master Stock Register</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Product Description</th>
+                                    <th>Qty On Hand</th>
+                                    <th>Mapped Storage Bin</th>
+                                </tr>
+                            </thead>
+                            <tbody id="master-stock-body"></tbody>
+                        </table>
+                    </section>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <script src="/app.js"></script>
