@@ -9,6 +9,7 @@
 </head>
 <body>
 
+    <!-- AUTHENTICATION FORM -->
     <div id="auth-wrapper" class="auth-box">
         <div id="login-card">
             <h2>Hardware Warehouse Portal</h2>
@@ -16,20 +17,18 @@
             <form id="login-form">
                 <input type="text" id="login-user" placeholder="Username" required>
                 <input type="password" id="login-pass" placeholder="Password" required>
-                <button type="submit">Authenticate</button>
+                <button type="submit">Log In</button>
             </form>
-            <p class="toggle-link">System Admin? <span onclick="toggleAuth(true)">Register Worker</span></p>
+            <p class="toggle-link">Need a new account? <span onclick="toggleAuth(true)">Register Worker</span></p>
         </div>
-
         <div id="signup-card" style="display: none;">
-            <h2>Register New Warehouse Staff</h2>
-            <p id="signup-msg" class="error-msg"></p>
+            <h2>Register Staff Profile</h2>
             <form id="signup-form">
                 <input type="text" id="signup-user" placeholder="Assign Username" required>
                 <input type="password" id="signup-pass" placeholder="Assign Password" required>
                 <select id="signup-role">
-                    <option value="picker">Picker</option>
-                    <option value="manager">Manager</option>
+                    <option value="picker">Picker (Staff)</option>
+                    <option value="manager">Manager / Admin</option>
                 </select>
                 <button type="submit">Save User Profile</button>
             </form>
@@ -37,25 +36,37 @@
         </div>
     </div>
 
+    <!-- MAIN DASHBOARD -->
     <div id="main-dashboard" style="display: none;">
         <header>
             <div class="header-container">
-                <h1>Smart Warehouse Routing Panel</h1>
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <h1 id="portal-title">Smart Warehouse Panel</h1>
+                    <span id="role-badge" class="badge">Role</span>
+                </div>
                 <div>
-                    <button onclick="switchTab('picker-tab')" style="background:#34495e; margin-right:10px;">Order Picking Engine</button>
-                    <button onclick="switchTab('inventory-tab')" style="background:#34495e; margin-right:10px;">Inventory Records</button>
+                    <button id="nav-picker" onclick="switchTab('picker-tab')" style="background:#34495e; margin-right:10px;">Picking Engine</button>
+                    <button id="nav-inventory" onclick="switchTab('inventory-tab')" style="background:#34495e; margin-right:10px;">Master Stock Register</button>
                     <button id="logout-btn" style="background:#c0392b;">Sign Out</button>
                 </div>
             </div>
         </header>
 
         <div class="container">
-            
+            <!-- PICKER & MANAGER VIEW: ROUTING ENGINE -->
             <div id="picker-tab" class="tab-content">
                 <section class="controls">
                     <label><b>Active Picking Order:</b></label>
                     <select id="picklist-selector"></select>
                     <button id="load-btn">Generate Optimized Path Matrix</button>
+                    
+                    <div style="margin-left:auto; display:flex; align-items:center; gap:10px;">
+                        <label for="route-mode"><b>Map View Mode:</b></label>
+                        <select id="route-mode" onchange="redrawCurrentMap()">
+                            <option value="live">Live Route (Skip Picked)</option>
+                            <option value="full">Complete Sequence Route</option>
+                        </select>
+                    </div>
                 </section>
 
                 <div class="dashboard-grid">
@@ -81,25 +92,41 @@
                         <div style="background:#fff; padding:10px; border-radius:5px; text-align:center;">
                             <canvas id="warehouseMap" width="360" height="400"></canvas>
                         </div>
-                        <p style="font-size:0.85rem; color:#666; margin-top:10px;">
-                            🟩 Start Node | 🔴 Picking Zone Targets | 🏁 Line displays optimized walking path minimizing picker exhaustion.
-                        </p>
                     </section>
                 </div>
             </div>
 
+            <!-- MANAGER EXCLUSIVE VIEW: INVENTORY & DISPATCH -->
             <div id="inventory-tab" class="tab-content" style="display:none;">
                 <div class="dashboard-grid">
-                    <section class="table-section">
-                        <h3>Add New SKU Asset</h3>
-                        <form id="inventory-form" style="display:flex; flex-direction:column; gap:10px;">
-                            <input type="text" id="inv-name" placeholder="Item Name (e.g. 12mm Steel Bolts)" required>
-                            <input type="text" id="inv-sku" placeholder="SKU String (Unique Code)" required>
-                            <input type="number" id="inv-qty" placeholder="Opening Stock Quantity" required>
-                            <input type="number" id="inv-bin" placeholder="Assigned Bin Target ID (1-6)" required>
-                            <button type="submit" style="background:#27ae60;">Commit Stock Record</button>
-                        </form>
-                    </section>
+                    <div style="display:flex; flex-direction:column; gap:20px;">
+                        <!-- Form 1: Stock Entry -->
+                        <section id="sku-entry-box" class="table-section">
+                            <h3>Add New SKU Asset</h3>
+                            <form id="inventory-form" style="display:flex; flex-direction:column; gap:10px;">
+                                <input type="text" id="inv-name" placeholder="Item Name (e.g. Steel Bolts)" required>
+                                <input type="text" id="inv-sku" placeholder="SKU String (Unique Code)" required>
+                                <input type="number" id="inv-qty" placeholder="Opening Stock Quantity" required>
+                                <input type="number" id="inv-bin" placeholder="Assigned Bin Target ID (1-6)" required>
+                                <button type="submit" style="background:#27ae60; color:white; border:none; padding:12px; font-weight:bold; cursor:pointer;">Commit Stock Record</button>
+                            </form>
+                        </section>
+
+                        <!-- Form 2: Manager Order Dispatcher -->
+                        <section id="dispatch-box" class="table-section">
+                            <h3>Assign Pick Ticket to Staff</h3>
+                            <form id="dispatch-form" style="display:flex; flex-direction:column; gap:10px;">
+                                <select id="dispatch-picker" required>
+                                    <option value="">-- Select Picker Staff --</option>
+                                </select>
+                                <select id="dispatch-item" required>
+                                    <option value="">-- Select Stock Item --</option>
+                                </select>
+                                <input type="number" id="dispatch-qty" placeholder="Quantity Requested" required min="1">
+                                <button type="submit" style="background:#e67e22; color:white; border:none; padding:12px; font-weight:bold; cursor:pointer;">Dispatch Ticket Order</button>
+                            </form>
+                        </section>
+                    </div>
 
                     <section class="table-section">
                         <h3>Current Master Stock Register</h3>
@@ -117,7 +144,6 @@
                     </section>
                 </div>
             </div>
-
         </div>
     </div>
 
