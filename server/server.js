@@ -127,6 +127,7 @@ app.get('/api/picklists', async (req, res) => {
 });
 
 
+// SAFE, FAIL-PROOF OPTIMIZED ROUTE
 app.get('/api/picklists/:id/optimized', async (req, res) => {
   const { id } = req.params;
   try {
@@ -149,22 +150,22 @@ app.get('/api/picklists/:id/optimized', async (req, res) => {
         s.map_y
       FROM pick_list_item pi 
       JOIN inventory_items i ON pi.item_id = i.item_id 
-      JOIN bin_location b ON i.bin_id = b.bin_id 
-      JOIN shelf_location s ON b.shelf_id = s.shelf_id
+      LEFT JOIN bin_location b ON i.bin_id = b.bin_id 
+      LEFT JOIN shelf_location s ON b.shelf_id = s.shelf_id
       WHERE pi.pick_list_id = ? 
       ORDER BY 
-        CASE COALESCE(i.abc_class, 'C')
+        CASE UPPER(COALESCE(i.abc_class, 'C'))
           WHEN 'A' THEN 1
           WHEN 'B' THEN 2
           ELSE 3
         END ASC,
-        s.aisle ASC, 
-        s.row_num ASC
+        COALESCE(s.aisle, 'A') ASC, 
+        COALESCE(s.row_num, 1) ASC
     `, [id]);
 
     res.json(items);
   } catch (err) {
-    console.error("❌ SQL ROUTE ERROR:", err.message);
+    console.error("❌ SQL ROUTE ERROR ON PICKLIST #" + id + ":", err.message);
     res.status(500).json({ error: err.message });
   }
 });
